@@ -1,0 +1,15 @@
+# Web
+flask
+
+# Database
+pymongo
+
+# Validation
+jsonschema
+
+# Date/time parsing
+python-dateutil
+pytz
+
+# Testing
+nose
