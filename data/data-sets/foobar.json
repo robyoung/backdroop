@@ -1,3 +1,25 @@
 {
-  "id": "foobar"
+  "id": "foobar",
+  "capped": true,
+  "cap_size": 86400,
+  "schema":{
+    "title": "Realtime Google Analytics Data",
+    "type": "object",
+    "properties": {
+      "_timestamp": {
+        "description": "An RFC3339 formatted date time, the API actually requies ISO8601 but the differences are minimal. RFC3339 is more explicit, maybe we should switch?",
+        "type": "string",
+        "format": "date-time"
+      },
+      "for_url": {
+        "description": "The 'filters' parameter from the Google Analytics query",
+        "type": "string"
+      },
+      "unique_visitors": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "required": ["_timestamp", "unique_visitors"]
+  }
 }
