@@ -3,6 +3,8 @@ from functools import partial
 
 from flask import Flask, request
 from jsonschema import validate, FormatChecker
+from bson import ObjectId
+import datetime
 
 from .models import FilesystemDataSets, NotFound
 from .storage.mongo import MongoData
@@ -78,14 +80,24 @@ def query_data_set(data_set_id):
 
         validate_query(query, data_set["schema"])
 
-        datasets_data.query(data_set_id, query)
-        return "query"
+        results = datasets_data.query(data_set_id, query)
+
+        return jsonify(results)
     except NotFound:
         return jsonify({"error": "Not found"}), 404
 
 # Helper functions
+class JsonEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
+
 def jsonify(data):
-    return app.response_class(json.dumps(data, indent=2))
+    return app.response_class(json.dumps(data, indent=2, cls=JsonEncoder))
 
 def listify(data):
     """Wrap value in a list if it is not already a list
