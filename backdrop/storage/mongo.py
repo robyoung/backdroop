@@ -41,9 +41,9 @@ class MongoData(Data):
 
     def query(self, data_set_id, query):
         if is_group_query(query):
-            return self._group_query(data_set_id, query)
+            return list(self._group_query(data_set_id, query))
         else:
-            return self._raw_query(data_set_id, query)
+            return list(self._raw_query(data_set_id, query))
 
     def _group_query(self, data_set_id, query):
         keys = get_group_keys(query)
