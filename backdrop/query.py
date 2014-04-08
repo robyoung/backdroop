@@ -3,7 +3,7 @@ import jsonschema
 class ValidationError(StandardError):
     pass
 
-query_schema2 = {
+query_schema = {
     "properties": {
         "start_at": {
             "type": "array",
@@ -49,72 +49,11 @@ query_schema2 = {
     "additionalProperties": False
 }
 
-query_schema = {
-    "title": "Query",
-    "properties": {
-        "start_at": {
-            "type": "string",
-            "format": "date-time"
-        },
-        "end_at": {
-            "type": "string",
-            "format": "date-time"
-        },
-        "filter_by": {
-            "type": "object",
-            "$ref": "#/definitions/filter_by"
-        },
-        "period": {
-            "enum": ["hour", "day", "week", "month", "quarter"]
-        },
-        "group_by": {
-            "type": "string",
-        },
-        "sort_by": {
-            "type": "object",
-            "$ref": "#/definitions/sort_by"
-        },
-        "limit": {
-            "type": "integer",
-            "minimum": 0
-        },
-        "collect": {
-            "type": "object",
-            "$ref": "#/definitions/collect"
-        }
-    },
-    "additionalProperties": False,
-    "definitions": {
-        "filter_by": {
-            "patternProperties": {
-                "^[a-z0-9_]+$": {
-                    "type": "string"
-                }
-            },
-            "additionalProperties": False
-        },
-        "sort_by": {
-            "properties": {
-                "field": { "type": "string" },
-                "direction": { "enum": ["ascending", "descending"] }
-            },
-            "required": ["field", "direction"],
-            "additionalProperties": False
-        },
-        "collect": {
-            "patternProperties": {
-                "^[a-z0-9_]+$": {
-                    "enum": ["sum", "count", "set", "mean"]
-                }
-            },
-            "additionalProperties": False
-        }
-    }
-}
 
 def validate_query_args(args):
     query_args = dict((key, args.getlist(key)) for key in args.keys())
-    jsonschema.validate(query_args, query_schema2)
+    jsonschema.validate(query_args, query_schema)
+
 
 def parse_query_args(args):
     query = {}
@@ -145,9 +84,8 @@ def parse_query_args(args):
     
     return query
 
+
 def validate_query(query, schema):
-    # validate that the query is correct
-    jsonschema.validate(query, query_schema)
     # validate that the query is valid with respect to the provided schema
     
     # start_at, end_at and period are only valid if the schema has _timestamp
