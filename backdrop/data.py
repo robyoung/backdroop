@@ -18,8 +18,25 @@ def parse_values(record, schema):
 
 
 def add_meta_fields(record):
+    """
+    >>> from datetime import datetime
+    >>> add_meta_fields({'_timestamp': datetime(2012, 12, 12)}).keys()
+    ['_timestamp', '_hour_start_at', '_day_start_at', '_month_start_at', '_week_start_at', '_quarter_start_at']
+    """
     if "_timestamp" in record:
         for period in PERIODS:
-            record[period.start_at_key] = period.start(
-                    record['_timestamp'])
+            period_start = period.start(record['_timestamp'])
+
+            record = add_fields(record, **{
+                period.start_at_key:period_start})
     return record
+
+
+def add_fields(record, **kwargs):
+    """
+    >>> add_fields({}, foo="bar")
+    {'foo': 'bar'}
+    >>> add_fields({"foo":"foo"}, foo="bar")
+    {'foo': 'bar'}
+    """
+    return dict(record.items() + kwargs.items())
