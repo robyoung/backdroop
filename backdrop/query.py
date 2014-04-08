@@ -1,4 +1,6 @@
 import jsonschema
+from .timeutils import parse_time_as_utc, parse_period
+
 
 class ValidationError(StandardError):
     pass
@@ -74,16 +76,16 @@ def parse_query_args(args):
     query = {}
 
     if "start_at" in args:
-        query['start_at'] = args.get('start_at')
+        query['start_at'] = parse_time_as_utc(args.get('start_at'))
     if "end_at" in args:
-        query['end_at'] = args.get('end_at')
+        query['end_at'] = parse_time_as_utc(args.get('end_at'))
     if "filter_by" in args:
         query["filter_by"] = {}
         for filter_by in args.getlist("filter_by"):
             field, value = filter_by.split(":", 1)
             query["filter_by"][field] = boolify(value)
     if "period" in args:
-        query["period"] = args.get("period")
+        query["period"] = parse_period(args.get("period"))
     if "group_by" in args:
         query["group_by"] = args.get("group_by")
     if "sort_by" in args:
