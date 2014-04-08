@@ -55,6 +55,21 @@ def validate_query_args(args):
     jsonschema.validate(query_args, query_schema)
 
 
+def boolify(value):
+    """
+    >>> boolify("true")
+    True
+    >>> boolify("false")
+    False
+    >>> boolify("foo")
+    'foo'
+    """
+    return {
+        "true": True,
+        "false": False,
+    }.get(value, value)
+
+
 def parse_query_args(args):
     query = {}
 
@@ -66,7 +81,7 @@ def parse_query_args(args):
         query["filter_by"] = {}
         for filter_by in args.getlist("filter_by"):
             field, value = filter_by.split(":", 1)
-            query["filter_by"][field] = value
+            query["filter_by"][field] = boolify(value)
     if "period" in args:
         query["period"] = args.get("period")
     if "group_by" in args:
@@ -77,10 +92,9 @@ def parse_query_args(args):
     if "limit" in args:
         query["limit"] = args.get("limit", type=int)
     if "collect" in args:
-        query["collect"] = {}
+        query["collect"] = []
         for collect in args.getlist("collect"):
-            field, function = collect.split(":", 1)
-            query["collect"][field] = function
+            query["collect"].append(collect.split(":", 1))
     
     return query
 
@@ -108,6 +122,6 @@ def validate_query(query, schema):
         raise ValidationError("Cannot sort by {}, field not present".format(query["sort_by"]["field"]))
 
     # can collect any core field
-    for field, function in query.get("collect", {}).items():
+    for field, function in query.get("collect", []):
         if field not in schema["properties"]:
             raise ValidationError("Cannot collect on {}, field not present".format(field))
