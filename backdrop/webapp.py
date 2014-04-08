@@ -10,6 +10,7 @@ from .models import FilesystemDataSets, NotFound
 from .storage.mongo import MongoData
 from .data import parse_values, add_meta_fields
 from .query import validate_query, parse_query_args, validate_query_args
+from .results import strip_internal_fields
 
 
 app = Flask("backdrop.webapp")
@@ -81,6 +82,9 @@ def query_data_set(data_set_id):
         validate_query(query, data_set["schema"])
 
         results = datasets_data.query(data_set_id, query)
+
+        results = map(strip_internal_fields, results)
+
 
         return jsonify(results)
     except NotFound:
