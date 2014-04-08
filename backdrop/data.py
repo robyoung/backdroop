@@ -1,6 +1,6 @@
 from dateutil.parser import parse as parse_datetime
 
-from .timeseries import PERIODS
+from .timeutils import PERIODS
 
 def parse_values(record, schema):
     """Parse values that cannot be represented in JSON

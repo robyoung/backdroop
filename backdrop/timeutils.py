@@ -1,7 +1,8 @@
-from datetime import timedelta, time
+from datetime import timedelta, time, datetime
 import time as _time
 from dateutil.relativedelta import relativedelta, MO
 import pytz
+from dateutil import parser
 
 
 class Period(object):
@@ -155,3 +156,32 @@ def _merge(first, second):
 
 def _truncate_time(datetime):
     return datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def parse_time_as_utc(time_string):
+    """
+    >>> parse_time_as_utc("2012-12-12T12:12:12+01:00")
+    datetime.datetime(2012, 12, 12, 11, 12, 12, tzinfo=<UTC>)
+    >>> parse_time_as_utc(datetime(2012, 12, 12, 12, 12, 12))
+    datetime.datetime(2012, 12, 12, 12, 12, 12, tzinfo=<UTC>)
+    """
+    if isinstance(time_string, datetime):
+        time = time_string
+    else:
+        time = parser.parse(time_string)
+    return as_utc(time)
+
+
+def as_utc(dt):
+    """
+    >>> from dateutil import tz
+    >>> as_utc(datetime(2012, 12, 12))
+    datetime.datetime(2012, 12, 12, 0, 0, tzinfo=<UTC>)
+    >>> as_utc(datetime(2012, 12, 12, tzinfo=tz.tzoffset(None, 3600)))
+    datetime.datetime(2012, 12, 11, 23, 0, tzinfo=<UTC>)
+    """
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=pytz.UTC)
+    else:
+        return dt.astimezone(pytz.UTC)
+
