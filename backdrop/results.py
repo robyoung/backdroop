@@ -21,7 +21,16 @@ def create_result_builder(query):
 
 
 def strip_period_starts(result):
-    return dict((field, value) for field, value in result.items() if not is_period_start(field))
+    """
+    >>> strip_period_starts({'foo': 'bar'})
+    {'foo': 'bar'}
+    >>> strip_period_starts({'_week_start_at': 'foo'})
+    {}
+    """
+    return dict(
+            (field, value)
+            for field, value in result.items()
+            if not is_period_start(field))
 
 
 def is_period_start(field):

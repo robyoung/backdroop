@@ -47,6 +47,7 @@ class MongoData(Data):
                 self._execute_query(data_set_id, query))
 
     def _execute_query(self, data_set_id, query):
+        """Execute the correct type of query; group or raw"""
         if is_group_query(query):
             return list(self._group_query(data_set_id, query))
         else:

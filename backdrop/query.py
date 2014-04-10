@@ -63,6 +63,7 @@ query_schema = {
 
 
 def validate_query_args(args):
+    """Validate query args (from flask) against the schema above"""
     query_args = dict((key, args.getlist(key)) for key in args.keys())
     jsonschema.validate(query_args, query_schema)
 
@@ -83,6 +84,7 @@ def boolify(value):
 
 
 def parse_query_args(args):
+    """Parse query args, at this point we know it's well formed"""
     query = {}
 
     if "start_at" in args:
@@ -112,7 +114,7 @@ def parse_query_args(args):
 
 
 def validate_query(query, schema):
-    # validate that the query is valid with respect to the provided schema
+    """Validate that the query is valid with respect to the provided shema"""
     
     # start_at, end_at and period are only valid if the schema has _timestamp
     if "_timestamp" not in schema['properties']:

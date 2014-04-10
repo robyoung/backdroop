@@ -1,3 +1,17 @@
+"""
+This module provides models that provide an interface similar to stagecraft
+
+FilesystemDataSets provides access to data set metadata
+
+Example:
+    data_sets = FilesystemDataSets()
+
+    # get a data set
+    data_sets.get(data_set_id)
+
+    # get a list of data sets
+    data_sets.list()
+"""
 import json
 import os
 

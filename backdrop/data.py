@@ -1,3 +1,6 @@
+"""
+This module handles validtion and processing of incoming records
+"""
 from functools import partial
 
 from dateutil.parser import parse as parse_datetime
