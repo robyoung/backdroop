@@ -1,8 +1,11 @@
+import datetime
+
 from pymongo import Connection
 import pymongo
 from bson import Code
 
 from .base import Data
+from ..timeutils import as_utc
 
 
 __all__ = ["MongoData"]
@@ -40,6 +43,10 @@ class MongoData(Data):
             self._db[data_set_id].save(record)
 
     def query(self, data_set_id, query):
+        return map(convert_datetimes_to_utc,
+                self._execute_query(data_set_id, query))
+
+    def _execute_query(self, data_set_id, query):
         if is_group_query(query):
             return list(self._group_query(data_set_id, query))
         else:
@@ -63,6 +70,26 @@ class MongoData(Data):
         limit = get_mongo_limit(query)
 
         return self._db[data_set_id].find(spec, sort=sort, limit=limit)
+
+
+def convert_datetimes_to_utc(result):
+    """Convert datatime values in a result to UTC
+
+    MongoDB ignores offsets, we don't.
+
+    >>> convert_datetimes_to_utc({})
+    {}
+    >>> convert_datetimes_to_utc({'foo': 'bar'})
+    {'foo': 'bar'}
+    >>> convert_datetimes_to_utc({'foo': datetime.datetime(2012, 12, 12)})
+    {'foo': datetime.datetime(2012, 12, 12, 0, 0, tzinfo=<UTC>)}
+    """
+    def time_as_utc(value):
+        if isinstance(value, datetime.datetime):
+            return as_utc(value)
+        return value
+
+    return dict((key, time_as_utc(value)) for key, value in result.items())
 
 
 def is_group_query(query):
