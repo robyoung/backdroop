@@ -1,5 +1,4 @@
 import json
-from functools import partial
 
 from flask import Flask, request
 from bson import ObjectId
@@ -9,7 +8,7 @@ from .models import FilesystemDataSets, NotFound
 from .storage.mongo import MongoData
 from .data import create_record_parser
 from .query import parse_query
-from .results import strip_period_starts, add_period_limits
+from .results import create_result_builder
 
 
 app = Flask("backdrop.webapp")
@@ -71,9 +70,7 @@ def query_data_set(data_set_id):
 
         results = datasets_data.query(data_set_id, query)
 
-        results = map(partial(add_period_limits, query), results)
-        results = map(strip_period_starts, results)
-
+        results = map(create_result_builder(query), results)
 
         return jsonify(results)
     except NotFound:
