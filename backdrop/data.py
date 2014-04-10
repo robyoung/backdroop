@@ -1,5 +1,7 @@
-from dateutil.parser import parse as parse_datetime
 from functools import partial
+
+from dateutil.parser import parse as parse_datetime
+from jsonschema import validate, FormatChecker
 
 from .timeutils import PERIODS
 
@@ -10,10 +12,12 @@ __all__ = ['create_record_parser']
 def create_record_parser(schema):
     """Return a function that parses incoming records and adds meta fields
 
+    - Validate records against the JSONSchema
     - Parse datetime fields based on the JSONSchema
     - Add meta fields for period start tiestamps
     """
     funcs = [
+        create_record_validator(schema),
         partial(parse_values, schema=schema),
         add_meta_fields
     ]
@@ -25,6 +29,15 @@ def create_record_parser(schema):
         # and returning the result
         return reduce(lambda record, func: func(record), [record] + funcs)
     return record_parser
+
+def create_record_validator(schema):
+    validate_ = partial(validate,
+            schema=schema,
+            format_checker=FormatChecker())
+    def validate_record(record):
+        validate_(record)
+        return record
+    return validate_record
 
 
 def parse_values(record, schema):

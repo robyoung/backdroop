@@ -2,7 +2,6 @@ import json
 from functools import partial
 
 from flask import Flask, request
-from jsonschema import validate, FormatChecker
 from bson import ObjectId
 import datetime
 
@@ -50,17 +49,12 @@ def post_to_data_set(data_set_id):
                     data_set.get("cap_size", 0),
                     data_set.get("schema", {}))
 
-        
-        # Save the records
         records = listify(request.json)
-        # Validate each record, currently would raise an exception
-        validate_ = partial(validate,
-                            schema=data_set['schema'],
-                            format_checker=FormatChecker())
-        map(validate_, records)
 
+        # Validate and parse incoming records
         records = map(create_record_parser(data_set['schema']), records)
 
+        # Save the incoming records
         datasets_data.save(data_set_id, records)
         
         return jsonify({"status": "ok", "saved": len(records)})
