@@ -43,6 +43,7 @@ def add_self_link(data_set):
     data_set['self'] = "http://localhost:8080/data-sets/{}".format(data_set['id'])
     return data_set
 
+
 class FilesystemDataSets(object):
     BASE_PATH = "./data/data-sets"
 
@@ -51,6 +52,7 @@ class FilesystemDataSets(object):
         if not os.path.isfile(file_path):
             raise NotFound
         return add_self_link(load_json_file(file_path))
+
 
     def list(self):
         abspath = partial(join, self.BASE_PATH)

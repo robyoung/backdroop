@@ -76,6 +76,7 @@ def query_data_set(data_set_id):
     except NotFound:
         return jsonify({"error": "Not found"}), 404
 
+
 # Helper functions
 class JsonEncoder(json.JSONEncoder):
 
@@ -86,9 +87,11 @@ class JsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
+
 def jsonify(data):
     return app.response_class(json.dumps(data, indent=2, cls=JsonEncoder),
             mimetype='application/json')
+
 
 def listify(data):
     """Wrap value in a list if it is not already a list

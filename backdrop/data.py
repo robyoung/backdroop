@@ -33,6 +33,7 @@ def create_record_parser(schema):
         return reduce(lambda record, func: func(record), [record] + funcs)
     return record_parser
 
+
 def create_record_validator(schema):
     validate_ = partial(validate,
             schema=schema,

@@ -15,14 +15,17 @@ def collection_name_from_id(data_set_id):
     """Calculate the Mongo collection name from the data set id"""
     return data_set_id
 
+
 class MongoData(Data):
     def __init__(self, host, database):
         self._mongo = Connection(host)
         self._db = self._mongo[database]
 
+
     def exists(self, data_set_id):
         collection_name = collection_name_from_id(data_set_id)
         return collection_name in self._db.collection_names()
+
 
     def create(self, data_set_id, capped, size, schema):
         # Create collection
@@ -38,13 +41,16 @@ class MongoData(Data):
             if field_name in required:
                 self._db[data_set_id].create_index(field_name)
 
+
     def save(self, data_set_id, records):
         for record in records:
             self._db[data_set_id].save(record)
 
+
     def query(self, data_set_id, query):
         return map(convert_datetimes_to_utc,
                 self._execute_query(data_set_id, query))
+
 
     def _execute_query(self, data_set_id, query):
         """Execute the correct type of query; group or raw"""
@@ -52,6 +58,7 @@ class MongoData(Data):
             return list(self._group_query(data_set_id, query))
         else:
             return list(self._raw_query(data_set_id, query))
+
 
     def _group_query(self, data_set_id, query):
         keys = get_group_keys(query)
@@ -126,6 +133,7 @@ def get_mongo_sort(query):
         direction = get_mongo_sort_direction(query["sort_by"]["direction"])
         return [(query["sort_by"]["field"], direction)]
 
+
 def get_mongo_sort_direction(direction):
     """
     >>> get_mongo_sort_direction("invalid")
@@ -138,6 +146,7 @@ def get_mongo_sort_direction(direction):
         "ascending": pymongo.ASCENDING,
         "descending": pymongo.DESCENDING,
     }.get(direction)
+
 
 def get_mongo_spec(query):
     filter_by = query.get("filter_by", {})
@@ -224,10 +233,12 @@ def build_group_reducer(collect_fields):
     return template.format(
             collectors=map(_build_collector_code, collect_fields))
 
+
 def _build_collector_code(collect_field):
     template = "if (current['{c}'] !== undefined) " \
                "{{ previous['{c}'].push(current['{c}']); }}"
     return template.format(c=clean_collect_field(collect_field))
+
 
 def clean_collect_field(collect_field):
     """
