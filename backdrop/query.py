@@ -1,9 +1,19 @@
 import jsonschema
 from .timeutils import parse_time_as_utc, parse_period
 
+__all__ = ['parse_query']
+
+
+def parse_query(query_args, schema):
+    validate_query_args(query_args)
+    query = parse_query_args(query_args)
+    validate_query(query, schema)
+    return query
+
 
 class ValidationError(StandardError):
     pass
+
 
 query_schema = {
     "properties": {

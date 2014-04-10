@@ -8,7 +8,7 @@ import datetime
 from .models import FilesystemDataSets, NotFound
 from .storage.mongo import MongoData
 from .data import create_record_parser
-from .query import validate_query, parse_query_args, validate_query_args
+from .query import parse_query
 from .results import strip_period_starts, add_period_limits
 
 
@@ -66,11 +66,8 @@ def post_to_data_set(data_set_id):
 def query_data_set(data_set_id):
     try:
         data_set = datasets.get(data_set_id)
-        
-        validate_query_args(request.args)
-        query = parse_query_args(request.args)
-
-        validate_query(query, data_set["schema"])
+   
+        query = parse_query(request.args, data_set['schema'])
 
         results = datasets_data.query(data_set_id, query)
 
