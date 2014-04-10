@@ -51,7 +51,7 @@ class MongoData(Data):
         collect_fields = get_unique_collect_fields(query)
 
         return self._db[data_set_id].group(
-            keys = keys,
+            key = keys,
             condition = build_group_condition(keys, spec),
             initial = build_group_initial_state(collect_fields),
             reduce = Code(build_group_reducer(collect_fields)))
