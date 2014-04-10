@@ -8,7 +8,7 @@ import datetime
 
 from .models import FilesystemDataSets, NotFound
 from .storage.mongo import MongoData
-from .data import parse_values, add_meta_fields
+from .data import create_record_parser
 from .query import validate_query, parse_query_args, validate_query_args
 from .results import strip_period_starts, add_period_limits
 
@@ -58,11 +58,8 @@ def post_to_data_set(data_set_id):
                             schema=data_set['schema'],
                             format_checker=FormatChecker())
         map(validate_, records)
-        # Parse formatted strings (ie. date times)
-        records = map(partial(parse_values,
-                              schema=data_set['schema']), records)
-        # Add meta fields ie. period start fields
-        records = map(add_meta_fields, records)
+
+        records = map(create_record_parser(data_set['schema']), records)
 
         datasets_data.save(data_set_id, records)
         

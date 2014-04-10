@@ -1,6 +1,31 @@
 from dateutil.parser import parse as parse_datetime
+from functools import partial
 
 from .timeutils import PERIODS
+
+
+__all__ = ['create_record_parser']
+
+
+def create_record_parser(schema):
+    """Return a function that parses incoming records and adds meta fields
+
+    - Parse datetime fields based on the JSONSchema
+    - Add meta fields for period start tiestamps
+    """
+    funcs = [
+        partial(parse_values, schema=schema),
+        add_meta_fields
+    ]
+    def record_parser(record):
+        # Python makes applying a list of functions to a value a bit mad
+        # create a list of functions with our record at the head
+        # [record, func, func, func]
+        # reduce it by calling each successive function on the record
+        # and returning the result
+        return reduce(lambda record, func: func(record), [record] + funcs)
+    return record_parser
+
 
 def parse_values(record, schema):
     """Parse values that cannot be represented in JSON
