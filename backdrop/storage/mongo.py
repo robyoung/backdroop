@@ -66,7 +66,15 @@ class MongoData(Data):
 
 
 def is_group_query(query):
-    return query.get("group_by") or query.get("period")
+    """
+    >>> is_group_query({"group_by": "foo"})
+    True
+    >>> is_group_query({"period": "week"})
+    True
+    >>> is_group_query({"foo": "bar"})
+    False
+    """
+    return bool(query.get("group_by") or query.get("period"))
 
 
 def get_mongo_limit(query):
