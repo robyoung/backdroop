@@ -5,9 +5,16 @@ __all__ = ['parse_query']
 
 
 def parse_query(query_args, schema):
+    """Validate and parse a flask query args
+
+    - Validate the raw query args are well formed
+    - Parse the query args into a more usable dict
+    - Validate the parsed query against the schema
+    """
     validate_query_args(query_args)
     query = parse_query_args(query_args)
     validate_query(query, schema)
+
     return query
 
 

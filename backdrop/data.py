@@ -24,13 +24,12 @@ def create_record_parser(schema):
         partial(parse_values, schema=schema),
         add_meta_fields
     ]
+
     def record_parser(record):
-        # Python makes applying a list of functions to a value a bit mad
-        # create a list of functions with our record at the head
-        # [record, func, func, func]
-        # reduce it by calling each successive function on the record
-        # and returning the result
-        return reduce(lambda record, func: func(record), [record] + funcs)
+        for func in funcs:
+            record = func(record)
+        return record
+
     return record_parser
 
 
@@ -38,9 +37,12 @@ def create_record_validator(schema):
     validate_ = partial(validate,
             schema=schema,
             format_checker=FormatChecker())
+
     def validate_record(record):
+        """Validate a record and then return the record"""
         validate_(record)
         return record
+
     return validate_record
 
 
@@ -56,6 +58,7 @@ def parse_values(record, schema):
         if field.get('format') == "date-time":
             if field_name in record:
                 record[field_name] = parse_datetime(record[field_name])
+
     return record
 
 

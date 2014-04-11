@@ -2,7 +2,7 @@ import re
 from functools import partial
 
 
-__all__ = ['build_results']
+__all__ = ['create_result_builder']
 
 
 def create_result_builder(query):
@@ -15,8 +15,12 @@ def create_result_builder(query):
         partial(add_period_limits, query),
         strip_period_starts
     ]
+
     def result_builder(result):
-        return reduce(lambda result, func: func(result), [result] + funcs)
+        for func in funcs:
+            result = func(result)
+        return result
+
     return result_builder
 
 
