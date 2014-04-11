@@ -11,14 +11,10 @@ def create_result_builder(query):
     - Add period limits to period queries
     - Strip meta fields for period start
     """
-    funcs = [
-        partial(add_period_limits, query),
-        strip_period_starts
-    ]
-
     def result_builder(result):
-        for func in funcs:
-            result = func(result)
+        result = add_period_limits(result, query)
+        result = strip_period_starts(result)
+
         return result
 
     return result_builder
@@ -47,7 +43,7 @@ def is_period_start(field):
     return bool(re.search('^_.*_start_at$', field))
 
 
-def add_period_limits(query, result):
+def add_period_limits(result, query):
     period = query.get('period')
     if period:
         start_at = result[period.start_at_key]

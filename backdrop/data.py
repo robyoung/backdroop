@@ -19,31 +19,19 @@ def create_record_parser(schema):
     - Parse datetime fields based on the JSONSchema
     - Add meta fields for period start tiestamps
     """
-    funcs = [
-        create_record_validator(schema),
-        partial(parse_values, schema=schema),
-        add_meta_fields
-    ]
-
     def record_parser(record):
-        for func in funcs:
-            record = func(record)
+        validate_record(record, schema)
+        
+        record = parse_values(record, schema)
+        record = add_meta_fields(record)
+
         return record
 
     return record_parser
 
 
-def create_record_validator(schema):
-    validate_ = partial(validate,
-            schema=schema,
-            format_checker=FormatChecker())
-
-    def validate_record(record):
-        """Validate a record and then return the record"""
-        validate_(record)
-        return record
-
-    return validate_record
+def validate_record(record, schema):
+    validate(record, schema=schema, format_checker=FormatChecker())
 
 
 def parse_values(record, schema):
